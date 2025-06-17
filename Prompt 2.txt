@@ -1,0 +1,147 @@
+Hey Copilot, can you please develop an interactive website.
+This website is used to perform Active Directory and windows server related tasks using powershell.
+Please make the website look professional. Keep a sidebar with all the buttons aligned in a column. Top bar keep it for header "HomeStart AD Manager". 
+Please add a search bar at the top right corner to navigate through the options/buttons. And also add hover information. Add relevant images as well.
+Keep the middle space for displaying input and output. Please make the website like a pro website and don't look like phishing or dodgy. Make sure buttons are displayed as boxes.
+We need the following buttons:
+"On-Board New User"
+"Assign Microsoft License"
+"Off-Board User"
+"Revoke Microsoft License"
+"Show Locked out Users"
+"Unlock all Users"
+"User Lockout Reason"
+"User sign-in on Machines"
+"Show Logged in Machine"
+"Show user's IP"
+"Show Logged in Users"
+"Show user recent lockout/failures" 
+"View Expiring/Expired AD Accounts".
+"Get User's Properties"
+"Add an User Membership"
+"Delete an User Membership"
+
+Each button here performs a powershell operation. Output should be displayed in the box like I mentioned above.
+I will explain you which button should perform what action. So accordingly please develop a powershell script.
+For this website please use Python, powershell and any relevant tools.
+Buttons should do these actions
+"On-Board New User" should create a new user in Active Directory. I have a customized script for this action. 
+Please use that script to write the app.py code and powershell script accordingly.
+Here is the script. There are inputs which are need to be given, so please modify this accordingly, so that it displays for the user to input and proceed accordingly. 
+
+"
+# Variables - Adjust these according to your environment
+$FirstName = "INPUT"
+$LastName = "INPUT"
+$UserName = "$FirstName.Substring(0, [Math]::Min($FirstName.Length, 1))$LastName.Substring(0, [Math]::Min(7, $LastName.Length))"
+$Password = "Henley@Helen@123" | ConvertTo-SecureString -AsPlainText -Force
+$OU = "OU=Users,OU=HomeStart,DC=homestart,DC=local"  # Change to your OU
+$Groups = @("All HomeStart", "Azure AD MFA", "Content Manager", "CSOD Production Access", "HomeStart", "HSF BYOD", "HSImprivata Users", "Offline_synce_user", "PhriendlyPhishing", "Proton", "Roaming User Profiles Users and Computers", "Wireless Access", "ZzZ_inMailX.License", "", "VPN Staff SSL")  # Add user to these groups
+
+# User attributes
+$UserPrincipalName = "$UserName@homestart.com.au"
+$DisplayName = "$FirstName $LastName"
+$Description = "INPUT"
+$Company = "HomeStart"
+$Title = "INPUT"
+$Department = "INPUT"
+
+# Create the user
+New-ADUser -Name $DisplayName `
+           -GivenName $FirstName `
+           -Surname $LastName `
+           -UserPrincipalName $UserPrincipalName `
+           -SamAccountName $UserName `
+           -Path $OU `
+           -AccountPassword $Password `
+           -Enabled $true `
+           -DisplayName $DisplayName `
+           -Description $Description `
+           -Company $Company `
+           -Title $Title `
+           -Department $Department `
+           -ChangePasswordAtLogon $true `
+           -PassThru
+
+# Add the user to groups
+foreach ($Group in $Groups) {
+    Add-ADGroupMember -Identity $Group -Members $UserName
+}
+
+# Output the results
+Write-Host "User $DisplayName ($UserPrincipalName) has been created and added to the specified groups."
+"
+
+Button "Assign Microsoft License" - This should assign a Microsoft 365 E3 license after connection to complany Microsoft 365 admin centre.
+Please write a powershell script for this. This should first check if the user is existing. Only then it should procced otherwise display "User not found"
+
+Button "Off-Board User" - This button should remove all the memberships from Active Directory account. 
+Please write script for this. This should ask which user account and do a confirmation check showing the username before removing.
+
+Button "Revoke Microsoft License" - This should revoke a Microsoft 365 E3 license after connection to complany Microsoft 365 admin centre.
+Please write a powershell script for this. This should first check if the user is existing. Only then it should procced otherwise display "User not found"
+This should ask which user account and do a confirmation check showing the username before removing.
+
+Button "Show Locked out Users" displays all the user accounts which are locked out. 
+You can use the below powershell script.
+"Search-ADAccount -LockedOut -UsersOnly -ResultPageSize 2000 -resultSetSize $null | Select-Object Name, SamAccountName, DistinguishedName"
+OR
+"Search-ADAccount -Lockedout | select-object Name, SamAccountName"
+
+Button "User Lockout Reason" displays information why user account is locked, which the calling computer for lockout.
+Please use the and modify the below script.
+"
+# Replace with the username you are investigating
+$targetUser = "username"  # Use only the username, not domain\username
+
+# Get all Domain Controllers
+$domainControllers = Get-ADDomainController -Filter *
+
+# Loop through each DC and check for Event ID 4740
+foreach ($dc in $domainControllers) {
+    Write-Host "Searching logs on DC: $($dc.HostName)" -ForegroundColor Cyan
+
+    $events = Get-WinEvent -ComputerName $dc.HostName -FilterHashtable @{
+        LogName = 'Security'
+        ID = 4740
+        StartTime = (Get-Date).AddDays(-7) # Search in the last 7 days
+    } -ErrorAction SilentlyContinue
+
+    foreach ($event in $events) {
+        $xml = [xml]$event.ToXml()
+        $lockedUser = $xml.Event.EventData.Data | Where-Object { $_.Name -eq 'TargetUserName' }
+
+        if ($lockedUser.'#text' -ieq $targetUser) {
+            $callerComputer = $xml.Event.EventData.Data | Where-Object { $_.Name -eq 'CallerComputerName' }
+            Write-Host "Account '$targetUser' was locked on DC '$($dc.HostName)' from computer: $($callerComputer.'#text')" -ForegroundColor Yellow
+        }
+    }
+}
+"
+
+Button "User sign-in on Machines" Please write a powershell script to show which all machines in the domain the input user account is signed in (active sessions).
+
+
+Button "Show user's IP" Please write a powershell script to show user's IP address.
+
+Button "Show Logged in Users" Please write a powershell script to show all the current logged in users.
+
+Button "Show user recent lockout/failures" Please write a powershell script to show the recent 3 day activity of user including signins, sign outs and lockouts.
+
+Button "View Expiring/Expired AD Accounts" Please write a powershell script to show all the Active Directory accounts with password expiry date and time. Please display in the order that nearest expiry date displays top.
+
+Button "Get User's Properties" Please write a powershell script to show all the active directory properties of an user.
+
+Button "Show Logged in Machine" Please write a powershell script to show the hostname of the machine user logged into and display it's properties
+
+Button "Clear CCMache Folder" Please write a powershell script to clear the temp of that machine. Machine name should be given as input in the search bar above this button like in the picture provided.
+
+Button "Show C:\ Drive Space" Please write a powershell script to display the C:\ Drive Space for the machine which will be given as input in the search bar above this button like in the picture provided.
+
+Button "Email AD User Audit" this will provide an AD report. You can use the below script.
+"get-aduser -filter * -Properties * | select displayname, city, company, department, EmailAddress, telephonenumber | export-csv -path c:\temp\export-all.csv"
+
+Remaining buttons please keep as it is. I havent decided yet what function to use them for.
+
+Please make sure it has no unicodedecode errors. 
+Thank you! 

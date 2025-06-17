@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Windows Server & AD Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 CDN & Custom Styles -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #181f2a;
+            --primary-header: #192841;
+            --primary-accent: #29b6f6;
+            --primary-accent-dark: #1976d2;
+            --primary-accent-light: #81d4fa;
+            --sidebar-bg: #212b3b;
+            --sidebar-border: #29b6f6;
+            --output-bg: #232e43;
+            --input-bg: #1e2533;
+            --box-shadow: 0 8px 24px rgba(33, 150, 243, 0.08);
+            --text-main: #e3e8f0;
+            --text-muted: #b0bec5;
+            --btn-gradient: linear-gradient(90deg, #29b6f6 0%, #1976d2 100%);
+            --btn-gradient-hover: linear-gradient(90deg, #1976d2 0%, #29b6f6 100%);
+            --btn-disabled-bg: #374151;
+        }
+        body {
+            background: var(--primary-bg);
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+        .header {
+            background: var(--primary-header);
+            color: var(--primary-accent);
+            padding: 28px 0 17px 0;
+            text-align: center;
+            margin-bottom: 28px;
+            border-radius: 0 0 32px 32px;
+            box-shadow: var(--box-shadow);
+            border-bottom: 4px solid var(--primary-accent);
+        }
+        .header h1 {
+            letter-spacing: 0.03em;
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .header h5 {
+            color: var(--text-muted);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+        .btn-custom {
+            margin: 7px 0;
+            width: 100%;
+            background: var(--btn-gradient);
+            color: #fff;
+            border: none;
+            font-weight: 500;
+            font-size: 1.08em;
+            border-radius: 7px;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 14px rgba(41,182,246,0.09);
+        }
+        .btn-custom:hover, .btn-custom:focus {
+            background: var(--btn-gradient-hover);
+            color: #fff;
+            box-shadow: 0 4px 18px rgba(25,118,210,0.16);
+        }
+        .btn-custom:disabled {
+            background: var(--btn-disabled-bg);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+        .output-box {
+            background: var(--output-bg);
+            border-radius: 12px;
+            min-height: 220px;
+            padding: 22px;
+            font-family: 'JetBrains Mono', 'Fira Mono', 'Consolas', monospace;
+            margin-bottom: 18px;
+            box-shadow: 0 0 16px #1976d222;
+            color: var(--text-main);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            border: 1.5px solid var(--primary-accent-dark);
+        }
+        .input-box {
+            background: var(--input-bg);
+            border-radius: 12px;
+            padding: 17px 18px;
+            box-shadow: 0 0 12px #29b6f633;
+            margin-bottom: 20px;
+            border: 1.5px solid var(--primary-accent);
+        }
+        .search-bar {
+            width: 220px;
+            border-radius: 7px;
+            border: 1px solid var(--primary-accent-light);
+            background: #121826;
+            color: var(--text-main);
+            padding: 7px 12px;
+            margin-right: 9px;
+            font-size: 1em;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .search-bar:focus {
+            border-color: var(--primary-accent);
+            background: #192841;
+        }
+        .side-bar {
+            background: var(--sidebar-bg);
+            border-radius: 22px;
+            padding: 24px 16px;
+            box-shadow: 0 0 16px #29b6f655;
+            border: 2px solid var(--sidebar-border);
+            min-width: 230px;
+        }
+        .right-side-bar {
+            background: var(--sidebar-bg);
+            border-radius: 22px;
+            padding: 24px 16px;
+            box-shadow: 0 0 16px #29b6f655;
+            border: 2px solid var(--sidebar-border);
+            min-width: 230px;
+        }
+        .btn-group-vertical {
+            width: 100%;
+        }
+        label {
+            color: var(--primary-accent-light);
+            font-weight: 500;
+        }
+        .form-control {
+            background: #131822;
+            border: 1.5px solid var(--primary-accent-light);
+            color: var(--text-main);
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .form-control:focus {
+            border-color: var(--primary-accent);
+            background: #192841;
+            color: var(--primary-accent);
+        }
+        @media (max-width: 991px) {
+            .side-bar, .right-side-bar { 
+                margin-bottom: 22px;
+                min-width: unset;
+            }
+            .output-box, .input-box {
+                padding: 15px 7px;
+            }
+        }
+        @media (max-width: 991px) {
+            .right-side-bar {
+                margin-top: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Windows Server & Active Directory Management</h1>
+        <h5>Perform AD & Server tasks easily with PowerShell</h5>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar with buttons (LEFT) -->
+            <div class="col-lg-3 col-md-4 side-bar">
+                <form method="post">
+                    <div class="btn-group-vertical">
+                        <button class="btn btn-custom" name="button" value="onboard_user">On-Board New User</button>
+                        <button class="btn btn-custom" name="button" value="assign_license">Assign Microsoft License</button>
+                        <button class="btn btn-custom" name="button" value="offboard_user">Off-Board User</button>
+                        <button class="btn btn-custom" name="button" value="revoke_license">Revoke Microsoft License</button>
+                        <button class="btn btn-custom" name="button" value="show_locked_out">Show Locked out Users</button>
+                        <button class="btn btn-custom" name="button" value="user_lockout_reason">User Lockout Reason</button>
+                        <button class="btn btn-custom" name="button" value="user_signin_machines">User sign-in on Machines</button>
+                        <div class="d-flex align-items-center mb-2">
+                            <input class="search-bar" type="text" name="search_input" placeholder="Type username" value="{{ search_input }}">
+                            <button class="btn btn-custom" name="button" value="show_user_ip" style="width:auto;">Show user's IP</button>
+                        </div>
+                        <button class="btn btn-custom" name="button" value="show_logged_in_users">Show Logged in Users</button>
+                        <button class="btn btn-custom" name="button" value="show_user_recent_lockout">Show user recent lockout/failures</button>
+                        <button class="btn btn-custom" name="button" value="view_expiring_accounts">View Expiring/Expired AD Accounts</button>
+                        <button class="btn btn-custom" name="button" value="get_user_properties">Get User's Properties</button>
+                        <button class="btn btn-custom" name="button" value="add_user_membership">Add an User Membership</button>
+                        <button class="btn btn-custom" name="button" value="delete_user_membership">Delete an User Membership</button>
+                        <button class="btn btn-custom" name="button" value="show_logged_in_machine">Show Logged in Machine</button>
+                        <div class="d-flex align-items-center mb-2">
+                            <input class="search-bar" type="text" name="search_input" placeholder="Type machine name" value="{{ search_input }}">
+                            <button class="btn btn-custom" name="button" value="clear_ccmcache" style="width:auto;">Clear CCMache Folder</button>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <input class="search-bar" type="text" name="search_input" placeholder="Type machine name" value="{{ search_input }}">
+                            <button class="btn btn-custom" name="button" value="show_c_drive" style="width:auto;">Show C:\ Drive Space</button>
+                        </div>
+                        <button class="btn btn-custom" name="button" value="email_ad_user_audit">Email AD User Audit</button>
+                        <button class="btn btn-custom" disabled>Other Function 1</button>
+                        <button class="btn btn-custom" disabled>Other Function 2</button>
+                    </div>
+                </form>
+            </div>
+            <!-- Main display/output box -->
+            <div class="col-lg-6 col-md-8">
+                <div class="output-box">
+                    {% if output %}
+                        {{ output|safe }}
+                    {% else %}
+                        <!-- Empty for now, will display results and forms -->
+                    {% endif %}
+                </div>
+                {% if input_fields %}
+                <div class="input-box">
+                    <form method="post">
+                        {% for field in input_fields %}
+                            <div class="mb-2">
+                                <label for="{{ field.id }}">{{ field.label }}:</label>
+                                <input class="form-control" type="{{ field.type }}" id="{{ field.id }}" name="{{ field.id }}" required>
+                            </div>
+                        {% endfor %}
+                        <input type="hidden" name="button" value="{{ request.form.button }}">
+                        <button type="submit" class="btn btn-primary mt-2">Submit</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            <!-- Exchange Powershell (RIGHT) Sidebar -->
+            <div class="col-lg-3 right-side-bar d-none d-md-block">
+                <div>
+                    <h5 class="mb-3 text-center" style="color: var(--primary-accent); font-weight:700;">Exchange Management</h5>
+                    <form method="post">
+                        <div class="btn-group-vertical">
+                            <button class="btn btn-custom" name="button" value="list_mailboxes">List All Mailboxes</button>
+                            <button class="btn btn-custom" name="button" value="get_mailbox_details">Get Mailbox Details</button>
+                            <button class="btn btn-custom" name="button" value="search_mailbox">Search Mailbox</button>
+                            <button class="btn btn-custom" name="button" value="set_mailbox_permissions">Set Mailbox Permissions</button>
+                            <button class="btn btn-custom" name="button" value="remove_mailbox_permissions">Remove Mailbox Permissions</button>
+                            <button class="btn btn-custom" name="button" value="enable_mailbox">Enable Mailbox</button>
+                            <button class="btn btn-custom" name="button" value="disable_mailbox">Disable Mailbox</button>
+                            <button class="btn btn-custom" name="button" value="add_mailbox_delegate">Add Mailbox Delegate</button>
+                            <button class="btn btn-custom" name="button" value="remove_mailbox_delegate">Remove Mailbox Delegate</button>
+                            <button class="btn btn-custom" name="button" value="set_out_of_office">Set Out of Office</button>
+                            <button class="btn btn-custom" name="button" value="remove_out_of_office">Remove Out of Office</button>
+                            <button class="btn btn-custom" name="button" value="list_distribution_groups">List Distribution Groups</button>
+                            <button class="btn btn-custom" name="button" value="add_distribution_group_member">Add Distribution Group Member</button>
+                            <button class="btn btn-custom" name="button" value="remove_distribution_group_member">Remove Distribution Group Member</button>
+                            <button class="btn btn-custom" disabled>Other Exchange Function</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

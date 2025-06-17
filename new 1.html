@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Windows Server & AD/Exchange Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Professional Bootstrap 5 & Custom Styles -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(120deg, #222b3a 0%, #1b2230 100%);
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(90deg, #223986 0%, #182c4e 100%);
+            color: white;
+            margin-bottom: 26px;
+            border-radius: 0 0 18px 18px;
+            box-shadow: 0 10px 26px rgba(22,34,60,0.21);
+            padding: 0;
+        }
+        .header-top {
+            padding-top: 30px;
+            padding-bottom: 8px;
+            text-align: center;
+        }
+        .brand {
+            font-size: 2.1em;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        .subtext {
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+        .header-bottom {
+            padding-bottom: 14px;
+            padding-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .header-bottom .home-btn {
+            color: #6bb0f4;
+            background: none;
+            border: none;
+            font-size: 2em;
+            margin-right: 8px;
+            margin-left: 10px;
+            transition: color 0.2s;
+        }
+        .header-bottom .home-btn:hover {
+            color: #fff;
+            text-decoration: none;
+        }
+        .header-bottom .navbar-nav {
+            flex-direction: row;
+            gap: 5px;
+        }
+        .header-bottom .nav-link,
+        .header-bottom .dropdown-toggle {
+            color: #fff !important;
+            font-weight: 500;
+            font-size: 1em;
+        }
+        .header-bottom .dropdown-menu {
+            background: #253560;
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 2px 12px #182c4e60;
+        }
+        .header-bottom .dropdown-item {
+            color: #b6d0ff;
+            font-size: 1em;
+        }
+        .header-bottom .dropdown-item:hover {
+            background: #223986;
+            color: #fff;
+        }
+        .header-bottom .navbar-search {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+        .header-bottom .search-bar {
+            width: 200px;
+            border-radius: 7px;
+            border: 1px solid #364f7e;
+            padding: 7px 12px;
+            background: #10182a;
+            color: #e6f0ff;
+            transition: outline 0.2s;
+        }
+        .header-bottom .search-bar:focus {
+            outline: 2px solid #5b9aff;
+        }
+        .sidebar-card {
+            background: #26314a;
+            border-radius: 18px;
+            padding: 18px 10px 18px 10px;
+            min-height: 700px;
+            color: #d6e2ff;
+        }
+        .sidebar-title {
+            color: #6bb0f4;
+            font-weight: 600;
+            font-size: 1.23em;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 2px 8px #0a1a2f44;
+        }
+        .btn-custom {
+            margin: 7px 0;
+            width: 100%;
+            background: linear-gradient(90deg, #2b4278 0%, #3a6cc1 100%);
+            color: white;
+            border: none;
+            font-weight: 500;
+            font-size: 1.08em;
+            box-shadow: 0 1px 8px rgba(66,165,245,0.07);
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(90deg, #4069b1 0%, #2b4278 100%);
+            color: #fff;
+        }
+        .output-box {
+            background: #202b3d;
+            border-radius: 13px;
+            min-height: 260px;
+            padding: 20px;
+            font-family: 'Fira Mono', monospace;
+            margin-bottom: 22px;
+            color: #90caf9;
+            box-shadow: 0 0 16px #22398644;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .input-box {
+            background: #1b2230;
+            border-radius: 13px;
+            padding: 20px;
+            box-shadow: 0 0 10px #3b7be633;
+            margin-bottom: 16px;
+        }
+        .search-bar {
+            width: 195px;
+            border-radius: 7px;
+            border: 1px solid #364f7e;
+            padding: 7px 12px;
+            margin-right: 10px;
+            background: #10182a;
+            color: #e6f0ff;
+        }
+        .search-bar:focus {
+            outline: 2px solid #5b9aff;
+        }
+        .btn-group-vertical {
+            width: 100%;
+        }
+        @media (max-width: 1100px) {
+            .sidebar-card { min-height: unset; margin-bottom: 16px;}
+        }
+        @media (max-width: 700px) {
+            .sidebar-card { margin-bottom: 14px;}
+            .output-box, .input-box { padding: 10px;}
+            .brand { font-size: 1.1em; }
+            .header-bottom .search-bar { width: 100px; }
+            .header-bottom { flex-direction: column; align-items: stretch; gap: 6px;}
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-top">
+            <span class="brand">HomeStart</span><br>
+            <span class="subtext">Infrastructure Management System</span>
+        </div>
+        <div class="header-bottom">
+            <!-- Home Button -->
+            <a class="home-btn" href="/" aria-label="Home">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1.4em" height="1.4em" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 2 7.5V14a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V11h2v3a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V7.5a.5.5 0 0 0-.146-.354l-6-6z"/>
+                </svg>
+            </a>
+            <!-- Dropdown Buttons -->
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenu1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Dropdown 1
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a class="dropdown-item" href="#">Option 1</a></li>
+                        <li><a class="dropdown-item" href="#">Option 2</a></li>
+                        <li><a class="dropdown-item" href="#">Option 3</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenu2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Dropdown 2
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                        <li><a class="dropdown-item" href="#">Option 1</a></li>
+                        <li><a class="dropdown-item" href="#">Option 2</a></li>
+                        <li><a class="dropdown-item" href="#">Option 3</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenu3" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Dropdown 3
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                        <li><a class="dropdown-item" href="#">Option 1</a></li>
+                        <li><a class="dropdown-item" href="#">Option 2</a></li>
+                        <li><a class="dropdown-item" href="#">Option 3</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenu4" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Dropdown 4
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                        <li><a class="dropdown-item" href="#">Option 1</a></li>
+                        <li><a class="dropdown-item" href="#">Option 2</a></li>
+                        <li><a class="dropdown-item" href="#">Option 3</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- Searchbar -->
+            <form class="navbar-search d-flex" role="search" onsubmit="event.preventDefault(); searchPageContents();">
+                <input class="search-bar" type="search" placeholder="Search..." aria-label="Search" id="headerSearchBar">
+                <button class="btn btn-primary ms-2" type="submit" style="background:#4069b1;border:none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row justify-content-between">
+            <!-- AD Sidebar -->
+            <div class="col-lg-2 col-md-3 mb-3">
+                <div class="sidebar-card">
+                    <form method="post">
+                        <input type="hidden" name="sidebar" value="ad">
+                        <div class="sidebar-title">AD Management</div>
+                        <div class="btn-group-vertical">
+                            <button class="btn btn-custom" name="button" value="onboard_user" type="submit">On-Board New User</button>
+                            <button class="btn btn-custom" name="button" value="assign_license" type="submit">Assign Microsoft License</button>
+                            <button class="btn btn-custom" name="button" value="offboard_user" type="submit">Off-Board User</button>
+                            <button class="btn btn-custom" name="button" value="revoke_license" type="submit">Revoke Microsoft License</button>
+                            <button class="btn btn-custom" name="button" value="show_locked_out" type="submit">Show Locked out Users</button>
+                            <button class="btn btn-custom" name="button" value="user_lockout_reason" type="submit">User Lockout Reason</button>
+                            <button class="btn btn-custom" name="button" value="user_signin_machines" type="submit">User sign-in on Machines</button>
+                            <button class="btn btn-custom" name="button" value="show_user_ip" type="submit">Show user's IP</button>
+                            
+							
+							<!--
+							<div class="d-flex align-items-center mb-2">
+                                <input class="search-bar" type="text" name="search_input" placeholder="Type username" value="{{ search_input }}">
+                                <button class="btn btn-custom" name="button" value="show_user_ip" type="submit" style="width:auto;">Show user's IP</button>
+                            </div>
+							--> 
+                            <button class="btn btn-custom" name="button" value="show_logged_in_users" type="submit">Show Logged in Users</button>
+                            <button class="btn btn-custom" name="button" value="show_user_recent_lockout" type="submit">Show user recent lockout/failures</button>
+                            <button class="btn btn-custom" name="button" value="view_expiring_accounts" type="submit">View Expiring/Expired AD Accounts</button>
+                            <button class="btn btn-custom" name="button" value="get_user_properties" type="submit">Get User's Properties</button>
+                            <button class="btn btn-custom" name="button" value="add_user_membership" type="submit">Add an User Membership</button>
+                            <button class="btn btn-custom" name="button" value="delete_user_membership" type="submit">Delete an User Membership</button>
+                            <button class="btn btn-custom" name="button" value="show_logged_in_machine" type="submit">Show Logged in Machine</button>
+                            <button class="btn btn-custom" name="button" value="clear_ccmcache" type="submit">clear CCMache Folder</button>
+                            <button class="btn btn-custom" name="button" value="show_c_drive" type="submit">Show C:\ Drive Space</button>
+                            
+							<!--
+							<div class="d-flex align-items-center mb-2">
+                                <input class="search-bar" type="text" name="search_input" placeholder="Type machine name" value="{{ search_input }}">
+                                <button class="btn btn-custom" name="button" value="clear_ccmcache" type="submit" style="width:auto;">Clear CCMache Folder</button>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <input class="search-bar" type="text" name="search_input" placeholder="Type machine name" value="{{ search_input }}">
+                                <button class="btn btn-custom" name="button" value="show_c_drive" type="submit" style="width:auto;">Show C:\ Drive Space</button>
+                            </div>
+							-->
+                            <button class="btn btn-custom" name="button" value="email_ad_user_audit" type="submit">Email AD User Audit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Main Output/Input -->
+            <div class="col-lg-8 col-md-6 mb-3">
+                <div class="output-box">
+                    {% if output %}
+                    {{ output|safe }}
+                    {% else %}
+                    <!-- Results will display here -->
+                    {% endif %}
+                </div>
+                {% if input_fields %}
+                <div class="input-box">
+                    <form method="post">
+                        {% for field in input_fields %}
+                        <div class="mb-2">
+                            <label for="{{ field.id }}">{{ field.label }}:</label>
+                            <input class="form-control" type="{{ field.type }}" id="{{ field.id }}" name="{{ field.id }}" required>
+                        </div>
+                        {% endfor %}
+                        <input type="hidden" name="button" value="{{ request.form.button }}">
+                        <input type="hidden" name="sidebar" value="{{ sidebar }}">
+                        <button type="submit" class="btn btn-primary mt-2">Submit</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            <!-- Exchange Sidebar -->
+            <div class="col-lg-2 col-md-3 mb-3">
+                <div class="sidebar-card">
+                    <form method="post">
+                        <input type="hidden" name="sidebar" value="exchange">
+                        <div class="sidebar-title">Exchange Management</div>
+                        <div class="btn-group-vertical">
+                            <button class="btn btn-custom" name="button" value="get_mailbox_info" type="submit">Get Mailbox Info</button>
+                            <button class="btn btn-custom" name="button" value="set_mailbox_forwarding" type="submit">Set Mailbox Forwarding</button>
+                            <button class="btn btn-custom" name="button" value="disable_mailbox" type="submit">Disable Mailbox</button>
+                            <button class="btn btn-custom" name="button" value="list_shared_mailboxes" type="submit">List Shared Mailboxes</button>
+                            <button class="btn btn-custom" name="button" value="get_mailbox_size" type="submit">Get Mailbox Size</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Sample JS for search (Replace with your own logic) -->
+    <script>
+        function searchPageContents() {
+            let q = document.getElementById('headerSearchBar').value.toLowerCase();
+            if (!q) return;
+            // Simple highlight search (replace with your own search logic as needed)
+            let bodyText = document.body.innerHTML;
+            // Remove previous highlights
+            document.body.innerHTML = bodyText.replace(/<mark class="search-highlight">([\s\S]*?)<\/mark>/g, '$1');
+            if (q.length < 2) return;
+            // Highlight occurrences in the output box and other visible areas (not in nav/sidebar)
+            function highlightInElement(selector) {
+                document.querySelectorAll(selector).forEach(el => {
+                    let html = el.innerHTML;
+                    let pattern = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                    el.innerHTML = html.replace(pattern, '<mark class="search-highlight">$1</mark>');
+                });
+            }
+            highlightInElement('.output-box, .input-box, .sidebar-card');
+        }
+    </script>
+    <style>
+        mark.search-highlight { background: #ffc940; color: #1b2230; padding: 0 2px; border-radius: 2px; }
+    </style>
+</body>
+</html>

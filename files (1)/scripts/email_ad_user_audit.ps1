@@ -1,0 +1,2 @@
+get-aduser -filter * -Properties * | select displayname, city, company, department, EmailAddress, telephonenumber | export-csv -path c:\temp\export-all.csv -NoTypeInformation
+Write-Host "Exported AD user audit report to C:\Temp\export-all.csv"

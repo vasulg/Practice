@@ -1,0 +1,17 @@
+#Assign Microsoft 365 E3 License
+
+# Connect to Microsoft 365
+$UserCredential = Get-Credential
+Connect-MsolService -Credential $UserCredential
+
+# Set the UPN for the created user
+$upn = "johndoe@yourdomain.com"
+
+# Retrieve the license SKU
+$licenseSku = "yourtenantname:ENTERPRISEPACK"
+
+# Assign the license
+Set-MsolUserLicense -UserPrincipalName $upn -AddLicenses $licenseSku
+
+# Disconnect from Microsoft 365
+Disconnect-MsolService

@@ -1,0 +1,21 @@
+# Import the AzureAD module
+Import-Module AzureAD
+
+# Sign in to your Azure account
+Connect-AzureAD
+
+# Define the user's UPN (User Principal Name) or ObjectId
+$userUPN = "user@yourdomain.com"  # Replace with the target user's UPN
+
+# Get the E3 license SKU
+$licenseSku = Get-AzureADSubscribedSku | Where-Object {$_.SkuPartNumber -eq "ENTERPRISEPACK"}
+
+if ($licenseSku -eq $null) {
+    Write-Host "E3 license SKU not found."
+    exit
+}
+
+# Assign the license to the user
+Set-AzureADUserLicense -ObjectId $userUPN -AssignedLicenses @(@{SkuId=$licenseSku.SkuId})
+
+Write-Host "E3 license assigned successfully to $userUPN."
